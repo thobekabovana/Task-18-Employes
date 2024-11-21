@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Register() {
   const [name, setName] = useState('');
@@ -10,8 +11,30 @@ function Register() {
   const [role, setRole] = useState('user'); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const userData = {
+      name,
+      email,
+      password,
+      companyName,
+      companyNumber,
+      role,
+    };
+
+    try {
+      await axios.post('http://localhost:3000/api/register', userData);
+      navigate('/logIn');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
@@ -19,6 +42,7 @@ function Register() {
         <h1 className="text-3xl font-bold mb-4 text-center text-pink-500">Sign Up</h1>
 
         <form onSubmit={handleSubmit}>
+          {/* Name Field */}
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
               Name and Surname
@@ -32,6 +56,7 @@ function Register() {
             />
           </div>
 
+          {/* Email Field */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-bold mb-2">
               Email
@@ -45,6 +70,7 @@ function Register() {
             />
           </div>
 
+          {/* Company Name */}
           <div className="mb-4">
             <label htmlFor="companyName" className="block text-gray-700 font-bold mb-2">
               Company Name
@@ -58,19 +84,21 @@ function Register() {
             />
           </div>
 
+          {/* Company Number */}
           <div className="mb-4">
-            <label htmlFor="number" className="block text-gray-700 font-bold mb-2">
+            <label htmlFor="companyNumber" className="block text-gray-700 font-bold mb-2">
               Company Registration Number
             </label>
             <input
               type="text"
-              id="number"
+              id="companyNumber"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:outline-none"
               value={companyNumber}
               onChange={(e) => setCompanyNumber(e.target.value)}
             />
           </div>
 
+          {/* Role */}
           <div className="mb-4">
             <label htmlFor="role" className="block text-gray-700 font-bold mb-2">
               Role
@@ -87,6 +115,7 @@ function Register() {
             </select>
           </div>
 
+          {/* Password */}
           <div className="mb-6">
             <label htmlFor="password" className="block text-gray-700 font-bold mb-2">
               Password
@@ -100,6 +129,7 @@ function Register() {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded w-full"

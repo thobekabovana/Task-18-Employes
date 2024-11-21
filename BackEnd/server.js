@@ -21,6 +21,66 @@ router.get('/', (req, res) => {
   res.send("Welcome to SA"); 
 });
 
+// POST /register - Register a new user
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, password, companyName, companyNumber, role } = req.body;
+
+    // Check if the company already exists and get the document reference
+    const userRef = await db.collection('users').where('companyNumber', '==', companyNumber).get();
+
+    if (!userRef.empty) {
+      return res.status(400).json({ message: 'Company number already registered' });
+    }
+
+    // Add user to Firestore with a document ID under their company number
+    await db.collection('users').add({
+      name,
+      email,
+      password, // Consider hashing passwords before storing
+      companyName,
+      companyNumber,
+      role
+    });
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error registering user', error: error.message });
+  }
+});
+
+// POST /login - Authenticate user
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Query Firestore for a user with the matching email
+    const userSnapshot = await db.collection('users').where('email', '==', email).get();
+
+    if (userSnapshot.empty) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Check if the password matches
+    let user;
+    userSnapshot.forEach(doc => {
+      if (doc.data().password === password) {
+        user = { id: doc.id, ...doc.data() };
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Respond with success (and optionally, send user data or token)
+    res.status(200).json({ message: 'Login successful' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error logging in', error: error.message });
+  }
+});
+
+
 // POST /employees - Add a new employee
 router.post('/employees', async (req, res) => {
   try {

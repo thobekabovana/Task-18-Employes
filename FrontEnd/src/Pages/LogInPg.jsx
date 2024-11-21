@@ -1,4 +1,6 @@
-
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function LogInPg() {
   const [email, setEmail] = useState('');
@@ -7,7 +9,23 @@ function LogInPg() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
+    try {
+      // Send login credentials to the server for verification
+      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      
+      // If login is successful, navigate to a dashboard or homepage
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid credentials');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
