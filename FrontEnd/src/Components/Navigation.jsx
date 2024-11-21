@@ -4,11 +4,23 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Use location to get the current path
+  const location = useLocation(); // Get current route location
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Check if current page is '/addForm', '/list', or '/view' to hide "Get Started" button
+  const shouldShowGetStartedButton =
+    location.pathname !== '/addForm' && location.pathname !== '/list' && location.pathname !== '/view';
+
+  // Check if current page is '/landing', '/register', '/login', '/list', or '/view' to hide "List" button
+  const shouldShowListButton =
+    location.pathname !== '/landing' &&
+    location.pathname !== '/register' &&
+    location.pathname !== '/logIn' &&
+    location.pathname !== '/list' &&
+    location.pathname !== '/view';
 
   return (
     <header className="bg-white shadow-md fixed w-full z-10">
@@ -34,13 +46,24 @@ const Navbar = () => {
           >
             Contact
           </button>
-          {/* Conditionally render the button based on current path */}
-          {location.pathname !== '/list' && (
+
+          {/* Conditionally render "Get Started" Button */}
+          {shouldShowGetStartedButton && (
             <button
-              onClick={() => navigate(location.pathname === '/addForm' ? '/list' : '/addForm')}
+              onClick={() => navigate('/register')}
               className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700"
             >
-              {location.pathname === '/addForm' ? 'List' : 'Get Started'}
+              Get Started
+            </button>
+          )}
+
+          {/* Conditionally render "List" Button */}
+          {shouldShowListButton && (
+            <button
+              onClick={() => navigate('/list')}
+              className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700"
+            >
+              List
             </button>
           )}
         </nav>
@@ -86,17 +109,33 @@ const Navbar = () => {
                 Contact
               </button>
             </li>
-            {/* Conditionally render the button based on current path */}
-            {location.pathname !== '/list' && (
+
+            {/* Conditionally render "Get Started" Button for Mobile */}
+            {shouldShowGetStartedButton && (
               <li>
                 <button
                   onClick={() => {
                     toggleMobileMenu();
-                    navigate(location.pathname === '/addForm' ? '/list' : '/addForm');
+                    navigate('/register');
                   }}
                   className="w-full bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700"
                 >
-                  {location.pathname === '/addForm' ? 'List' : 'Get Started'}
+                  Get Started
+                </button>
+              </li>
+            )}
+
+            {/* Conditionally render "List" Button for Mobile */}
+            {shouldShowListButton && (
+              <li>
+                <button
+                  onClick={() => {
+                    toggleMobileMenu();
+                    navigate('/list');
+                  }}
+                  className="w-full bg-pink-800 text-white px-4 py-2 rounded hover:bg-pink-700"
+                >
+                  List
                 </button>
               </li>
             )}
